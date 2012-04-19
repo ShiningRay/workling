@@ -33,7 +33,7 @@ module Workling
 
         def listen
           # Allow concurrency for our tasks
-          ActiveRecord::Base.allow_concurrency = true
+          # ActiveRecord::Base.allow_concurrency = true
 
           # Start the EM loop. Some indexers will need it
 
