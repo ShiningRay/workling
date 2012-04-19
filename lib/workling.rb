@@ -19,7 +19,6 @@ module Workling
     end
   end
   
-  mattr_accessor :load_path
   @@load_path = [ File.expand_path(File.join(File.dirname(__FILE__), '../../../../app/workers')) ]
   VERSION = "0.4.2.3"
   
@@ -32,7 +31,7 @@ module Workling
   #   Workling::Remote.dispatcher = Workling::Remote::Runners::StarlingRunner.new
   #
   def self.default_runner
-    if RAILS_ENV == "test"
+    if Rails.env == "test"
       Workling::Remote::Runners::NotRemoteRunner.new
     elsif starling_installed?
       Workling::Remote::Runners::StarlingRunner.new
@@ -122,8 +121,8 @@ module Workling
   #
   def self.config
     begin
-      config_path = File.join(RAILS_ROOT, 'config', 'workling.yml')
-      @@config ||=  YAML.load_file(config_path)[RAILS_ENV || 'development'].symbolize_keys
+      config_path = Rails.root.join('config', 'workling.yml').to_s
+      @@config ||=  YAML.load_file(config_path)[Rails.env || 'development'].symbolize_keys
       @@config[:memcache_options].symbolize_keys! if @@config[:memcache_options]
       @@config 
     rescue
@@ -136,8 +135,7 @@ module Workling
   #  Raises exceptions thrown inside of the worker. normally, these are logged to 
   #  logger.error. it's easy to miss these log calls while developing, though. 
   #
-  mattr_accessor :raise_exceptions
-  @@raise_exceptions = (RAILS_ENV == "test" || RAILS_ENV == "development")
+  @@raise_exceptions = (Rails.env == "test" || Rails.env == "development")
   
   def self.raise_exceptions?
     @@raise_exceptions
@@ -148,3 +146,6 @@ module Workling
       raise Workling::WorklingNotFoundError.new("could not find #{ clazz }:#{ method } workling. ") 
     end
 end
+
+require 'workling/discovery.rb'
+require 'workling/base.rb'
