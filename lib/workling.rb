@@ -43,6 +43,11 @@ module Workling
       Workling::Remote::Runners::NotRemoteRunner.new
     end
   end
+
+  # to use as a hook to start workling
+  def self.base_path
+    File.dirname(__FILE__)
+  end
   
   #
   # gets the worker instance, given a class. the optional method argument will cause an 
